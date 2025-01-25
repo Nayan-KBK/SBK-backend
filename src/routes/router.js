@@ -11,6 +11,7 @@ const path = require('path');
 
 
 
+
 router.get('/',(req,res)=>{
   res.send("Welcome to SBK Backend . . . .")
 })
@@ -81,7 +82,7 @@ router.delete('/delete-data', async (req, res) => {
     const result = await messageSchema.deleteMany({ _id: { $in: idArray } });
 
     res.status(200).json({
-      message: `${result.deletedCount} item(s) deleted successfully`,
+      memessagessage: `${result.deletedCount} item(s) deleted successfully`,
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete data', details: error.message });
@@ -142,6 +143,7 @@ router.post("/login", async (req, res) => {
     res.status(400).send(error.message);
   }
 });
+
 
 
 
@@ -227,6 +229,10 @@ router.post('/export-excel', async (req, res) => {
       res.status(500).send({ message: 'Error generating Excel file', error });
   }
 });
+
+
+
+
 
 
 
