@@ -155,43 +155,37 @@ router.post('/export-excel', async (req, res) => {
       // Calculate the start date based on the selected range
       const now = new Date();
       let startDate;
-      if (range !== 'all') {
-          switch (range) {
-              case '7d':
-                  startDate = new Date(now - 7 * 24 * 60 * 60 * 1000);
-                  break;
-              case '15d':
-                  startDate = new Date(now - 15 * 24 * 60 * 60 * 1000);
-                  break;
-              case '1m':
-                  startDate = new Date(now.setMonth(now.getMonth() - 1));
-                  break;
-              case '3m':
-                  startDate = new Date(now.setMonth(now.getMonth() - 3));
-                  break;
-              case '6m':
-                  startDate = new Date(now.setMonth(now.getMonth() - 6));
-                  break;
-              case '1y':
-                  startDate = new Date(now.setFullYear(now.getFullYear() - 1));
-                  break;
-              default:
-                  startDate = null; // No date filter
-          }
-      } else {
-          startDate = null; // No date filter if 'all' range
+      switch (range) {
+          case '7d':
+              startDate = new Date(now - 7 * 24 * 60 * 60 * 1000);
+              break;
+          case '15d':
+              startDate = new Date(now - 15 * 24 * 60 * 60 * 1000);
+              break;
+          case '1m':
+              startDate = new Date(now.setMonth(now.getMonth() - 1));
+              break;
+          case '3m':
+              startDate = new Date(now.setMonth(now.getMonth() - 3));
+              break;
+          case '6m':
+              startDate = new Date(now.setMonth(now.getMonth() - 6));
+              break;
+          case '1y':
+              startDate = new Date(now.setFullYear(now.getFullYear() - 1));
+              break;
+          default:
+              startDate = null; // No date filter
       }
 
       // Build the query based on the section and date range
       const query = {};
-      if (section !== 'all') {
-          if (section === 'services') {
-              query.pageUrl = { $nin: ['home', 'contact-us'] }; // All other pages are services
-          } else {
-              query.pageUrl = section; // Match the section directly
-          }
+      if (section === 'services') {
+          query.pageUrl = { $nin: ['home', 'contact-us'] }; // All other pages are services
+      } else {
+          query.pageUrl = section; // Match the section directly
       }
-      
+
       if (startDate) {
           query.submittedAt = { $gte: startDate }; // Add date filter
       }
@@ -233,6 +227,8 @@ router.post('/export-excel', async (req, res) => {
       res.status(500).send({ message: 'Error generating Excel file', error });
   }
 });
+
+
 
 
 module.exports = router;
