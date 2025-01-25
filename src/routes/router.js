@@ -12,6 +12,7 @@ const path = require('path');
 
 
 
+
 router.get('/',(req,res)=>{
   res.send("Welcome to SBK Backend . . . .")
 })
