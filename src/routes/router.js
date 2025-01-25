@@ -4,6 +4,9 @@ const router = express.Router();
 const messageSchema = require('../db/messageSchema');
 const AdminSchema = require('../db/AdminSchema');
 const jwt = require('jsonwebtoken');
+const XLSX = require('xlsx');
+const fs = require('fs');
+const path = require('path');
 
 
 
@@ -139,6 +142,93 @@ router.post("/login", async (req, res) => {
     res.status(400).send(error.message);
   }
 });
+
+
+
+
+
+// Define the route
+router.post('/export-excel', async (req, res) => {
+  try {
+      const { section, range } = req.body;
+
+      // Calculate the start date based on the selected range
+      const now = new Date();
+      let startDate;
+      switch (range) {
+          case '7d':
+              startDate = new Date(now - 7 * 24 * 60 * 60 * 1000);
+              break;
+          case '15d':
+              startDate = new Date(now - 15 * 24 * 60 * 60 * 1000);
+              break;
+          case '1m':
+              startDate = new Date(now.setMonth(now.getMonth() - 1));
+              break;
+          case '3m':
+              startDate = new Date(now.setMonth(now.getMonth() - 3));
+              break;
+          case '6m':
+              startDate = new Date(now.setMonth(now.getMonth() - 6));
+              break;
+          case '1y':
+              startDate = new Date(now.setFullYear(now.getFullYear() - 1));
+              break;
+          default:
+              startDate = null; // No date filter
+      }
+
+      // Build the query based on the section and date range
+      const query = {};
+      if (section === 'services') {
+          query.pageUrl = { $nin: ['home', 'contact-us'] }; // All other pages are services
+      } else {
+          query.pageUrl = section; // Match the section directly
+      }
+
+      if (startDate) {
+          query.submittedAt = { $gte: startDate }; // Add date filter
+      }
+
+      // Fetch the filtered data
+      const data = await messageSchema.find(query).lean();
+
+      // Format the data for Excel
+      const formattedData = data.map(item => ({
+          FirstName: item.firstName,
+          LastName: item.lastName,
+          Mobile: item.mobile,
+          Email: item.email,
+          Subject: item.subject,
+          Message: item.message,
+          PageUrl: item.pageUrl,
+          SubmittedAt: item.submittedAt.toISOString(),
+      }));
+
+      // Ensure the `exports` directory exists
+      const exportDir = path.join(__dirname, '../../exports');
+      if (!fs.existsSync(exportDir)) {
+          fs.mkdirSync(exportDir, { recursive: true });
+      }
+
+      // Create the Excel workbook and worksheet
+      const worksheet = XLSX.utils.json_to_sheet(formattedData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Messages');
+
+      // Write the workbook to a file
+      const filePath = path.join(exportDir, 'messages.xlsx');
+      XLSX.writeFile(workbook, filePath);
+
+      // Send the file to the client
+      res.download(filePath, 'messages.xlsx');
+  } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: 'Error generating Excel file', error });
+  }
+});
+
+
 
 
 
