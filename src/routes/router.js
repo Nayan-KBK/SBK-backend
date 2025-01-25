@@ -57,7 +57,7 @@ router.get('/get-all-data', async (req, res) => {
 
 
 
-router.delete('/data', async (req, res) => {
+router.delete('/delete-data', async (req, res) => {
   try {
     const { ids } = req.body; // Expect an array of IDs for bulk delete or a single ID for single delete
 
