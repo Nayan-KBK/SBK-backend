@@ -5,6 +5,15 @@ const messageSchema = require('../db/messageSchema');
 const AdminSchema = require('../db/AdminSchema');
 const jwt = require('jsonwebtoken');
 
+
+
+
+router.get('/',(req,res)=>{
+  res.send("Welcome to SBK Backend . . . .")
+})
+
+
+
 // POST route to save a message
 router.post('/submit-form', async (req, res) => {
   const { firstName, lastName, mobile, email, subject, message, pageUrl } = req.body;
