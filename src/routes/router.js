@@ -82,7 +82,7 @@ router.delete('/delete-data', async (req, res) => {
     const result = await messageSchema.deleteMany({ _id: { $in: idArray } });
 
     res.status(200).json({
-      memessagessage: `${result.deletedCount} item(s) deleted successfully`,
+      message: `${result.deletedCount} item(s) deleted successfully`,
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete data', details: error.message });
