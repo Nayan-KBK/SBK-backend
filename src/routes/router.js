@@ -12,7 +12,7 @@ const path = require('path');
 
 
 
-router.get('/',(req,res)=>{
+router.get('/', (req, res) => {
   res.send("Welcome to SBK Backend . . . .")
 })
 
@@ -98,7 +98,7 @@ router.delete('/delete-data', async (req, res) => {
 
 router.post("/register", async (req, res) => {
   try {
-    const { email, password, roles } = req.body;
+    const { email, password, role } = req.body;
 
     if (!email || !password) {
       return res.status(400).send("Email and password are required.");
@@ -111,7 +111,7 @@ router.post("/register", async (req, res) => {
     }
 
     // Create a new admin instance
-    const admin = new AdminSchema({ email, password, roles });
+    const admin = new AdminSchema({ email, password, role });
     await admin.save();
 
     res.status(201).send("Admin registered successfully");
@@ -160,7 +160,15 @@ router.post("/login", async (req, res) => {
     }
 
     // Send success response
-    res.send("Login successful");
+    // res.send("Login successful");
+    // res.status(200).json({message:"Login successful",role: role})
+    console.log("admin--------------.>",admin)
+    console.log("admin.role--------------.>",admin.role)
+    res.status(200).json({
+      message: "Login successful",
+      role: admin.role, // Assuming `roles` is an array in the schema
+      
+    });
   } catch (error) {
     res.status(400).send(error.message);
   }
