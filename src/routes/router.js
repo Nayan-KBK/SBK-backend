@@ -12,12 +12,17 @@ const nodemailer = require("nodemailer");
 require("dotenv").config();
 
 const transporter = nodemailer.createTransport({
-  service: "Gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true, // Use SSL
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
 });
+
+
+
 router.get('/', (req, res) => {
   res.send("Welcome to SBK Backend . . . .")
 })
@@ -62,7 +67,16 @@ router.post('/submit-form', async (req, res) => {
         <p><strong>Page URL:</strong> ${pageUrl}</p>
       `,
     };
-    await transporter.sendMail(mailOptions);   
+    // await transporter.sendMail(mailOptions);   
+    try {
+  await transporter.sendMail(mailOptions);
+} catch (error) {
+  console.error("Error sending email:", error);
+  return res.status(500).send({ message: "Error sending email", error });
+}
+
+
+    
     res.status(201).send({ message: 'Message saved successfully' });
   } catch (error) {
     res.status(500).send({ message: 'Error saving message', error });
