@@ -3,14 +3,13 @@ const bcrypt = require("bcryptjs"); // For hashing passwords
 
 const AdminSchema = new mongoose.Schema(
   {
-    
     email: {
       type: String,
       required: true,
       unique: true,
       lowercase: true,
       match: [
-        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+        /^\w+([.-]?\w+)*@\w+([.-]?\w{2,3})+$/,
         "Please use a valid email address",
       ],
     },
@@ -19,8 +18,11 @@ const AdminSchema = new mongoose.Schema(
       required: true,
       minlength: 8,
     },
-   
-  }
+    roles: {
+      type: [String], // Array of roles (e.g., ["admin", "user"])
+      default: ["admin"], // Default role is "admin"
+    },
+  },
 );
 
 // Pre-save hook to hash the password before saving
@@ -41,4 +43,4 @@ AdminSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-module.exports = mongoose.model("Admin", AdminSchema);
+module.exports = mongoose.model("Admins", AdminSchema);
