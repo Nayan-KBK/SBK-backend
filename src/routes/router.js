@@ -7,17 +7,20 @@ const jwt = require('jsonwebtoken');
 const XLSX = require('xlsx');
 const fs = require('fs');
 const path = require('path');
+const nodemailer = require("nodemailer");
 
+require("dotenv").config();
 
-
-
-
+const transporter = nodemailer.createTransport({
+  service: "Gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 router.get('/', (req, res) => {
   res.send("Welcome to SBK Backend . . . .")
 })
-
-
-
 // POST route to save a message
 router.post('/submit-form', async (req, res) => {
   const { firstName, lastName, mobile, email, subject, message, pageUrl } = req.body;
@@ -35,19 +38,36 @@ router.post('/submit-form', async (req, res) => {
     });
 
     await newMessage.save();
+
+
+
+
+
+
+
+
+     // Send email notification
+     const mailOptions = {
+      from:  process.env.EMAIL_USER, // Sender address
+      to: "nayandhongadi.kbk@gmail.com", 
+      subject: `New Inquiry Received by ${firstName} ${lastName}`,
+      html: `
+        <h3>New Inquiry Details:</h3>
+        <p><strong>First Name:</strong> ${firstName}</p>
+        <p><strong>Last Name:</strong> ${lastName}</p>
+        <p><strong>Mobile:</strong> ${mobile}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Subject:</strong> ${subject}</p>
+        <p><strong>Message:</strong> ${message}</p>
+        <p><strong>Page URL:</strong> ${pageUrl}</p>
+      `,
+    };
+    await transporter.sendMail(mailOptions);   
     res.status(201).send({ message: 'Message saved successfully' });
   } catch (error) {
     res.status(500).send({ message: 'Error saving message', error });
   }
 });
-
-
-
-
-
-
-
-
 
 // API to get all data
 router.get('/get-all-data', async (req, res) => {
@@ -58,8 +78,6 @@ router.get('/get-all-data', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch data' });
   }
 });
-
-
 
 router.delete('/delete-data', async (req, res) => {
   try {
@@ -88,14 +106,7 @@ router.delete('/delete-data', async (req, res) => {
     res.status(500).json({ error: 'Failed to delete data', details: error.message });
   }
 });
-
-
-
 // Register Admin
-
-
-
-
 router.post("/register", async (req, res) => {
   try {
     const { email, password, role } = req.body;
@@ -125,20 +136,6 @@ router.post("/register", async (req, res) => {
     res.status(500).send("Internal server error.");
   }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 // Admin Login
@@ -173,16 +170,6 @@ router.post("/login", async (req, res) => {
     res.status(400).send(error.message);
   }
 });
-
-
-
-
-
-
-
-
-
-
 
 router.post('/export-excel', async (req, res) => {
   try {
