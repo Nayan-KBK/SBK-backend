@@ -18,9 +18,8 @@ const AdminSchema = new mongoose.Schema(
       required: true,
       minlength: 8,
     },
-    roles: {
-      type: [String], // Array of roles (e.g., ["admin", "user"])
-      default: ["admin"], // Default role is "admin"
+    role: {
+      type: String,
     },
   },
 );
