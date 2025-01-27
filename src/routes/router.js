@@ -95,26 +95,48 @@ router.delete('/delete-data', async (req, res) => {
 
 
 
+
 router.post("/register", async (req, res) => {
   try {
-    const { email, password, } = req.body;
+    const { email, password, roles } = req.body;
 
-    // Create a new admin instance
-    const admin = new AdminSchema({  email, password });
-
-    // Save admin to the database
-    await admin.save();
-    res.status(201).send("Admin registered successfully");
-  } catch (error) {
-    if (error.code === 11000) {
-      const field = Object.keys(error.keyPattern)[0]; // Get the field causing the error
-      return res.status(400).send(`${field} is already in use.`);
+    if (!email || !password) {
+      return res.status(400).send("Email and password are required.");
     }
 
-    // Handle other errors
-    res.status(400).send(error.message);
+    // Check if the email already exists
+    const existingAdmin = await AdminSchema.findOne({ email });
+    if (existingAdmin) {
+      return res.status(400).send("Email is already in use.");
+    }
+
+    // Create a new admin instance
+    const admin = new AdminSchema({ email, password, roles });
+    await admin.save();
+
+    res.status(201).send("Admin registered successfully");
+  } catch (error) {
+    console.error("Error while registering admin:", error);
+
+    if (error.code === 11000) {
+      return res.status(400).send("Email is already in use.");
+    }
+
+    res.status(500).send("Internal server error.");
   }
 });
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -143,6 +165,12 @@ router.post("/login", async (req, res) => {
     res.status(400).send(error.message);
   }
 });
+
+
+
+
+
+
 
 
 
