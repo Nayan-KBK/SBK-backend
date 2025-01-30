@@ -54,7 +54,9 @@ router.post('/submit-form', async (req, res) => {
      // Send email notification
      const mailOptions = {
       from:  process.env.EMAIL_USER, // Sender address
-      to: "nayandhongadi.kbk@gmail.com", 
+      to: "contact@sbataxconsultants.com", 
+      cc: ["shivakrishna@equinoxitsol.com","usitdallas@gmail.com"],    
+      // to: "nayandhongadi.kbk@gmail.com", 
       subject: `New Inquiry Received by ${firstName} ${lastName}`,
       html: `
         <h3>New Inquiry Details:</h3>
