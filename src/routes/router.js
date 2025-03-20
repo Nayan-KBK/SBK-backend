@@ -46,7 +46,7 @@ router.get('/', (req, res) => {
 
 // POST route to save a message
 router.post('/submit-form', async (req, res) => {
-  const { firstName, lastName, mobile, email, subject, message, pageUrl,page } = req.body;
+  const { firstName, lastName, mobile, email, subject, message, pageUrl } = req.body;
   try {
     // console.log(firstName,lastName,mobile,email,subject,message)
     const newMessage = new messageSchema({
@@ -56,47 +56,19 @@ router.post('/submit-form', async (req, res) => {
       email,
       subject,
       message,
-      pageUrl,
-      page
+      pageUrl
 
     });
 
     await newMessage.save();
 
     // Send email notification
-
-
-
-    // const mailOptions = {
-    //   from: process.env.EMAIL_USER,
-    //   to: "contact@sbataxconsultants.com",
-    //   cc: ["shivakrishna@equinoxitsol.com", "usitdallas@gmail.com"],
-    //   subject: `New Inquiry Received by ${firstName} ${lastName} for SBA`,
-    //   html: `
-    //     <h3>New Inquiry Details:</h3>
-    //     <p><strong>First Name:</strong> ${firstName}</p>
-    //     <p><strong>Last Name:</strong> ${lastName}</p>
-    //     <p><strong>Mobile:</strong> ${mobile}</p>
-    //     <p><strong>Email:</strong> ${email}</p>
-    //     <p><strong>Subject:</strong> ${subject}</p>
-    //     <p><strong>Message:</strong> ${message}</p>
-    //     <p><strong>Page URL:</strong> ${pageUrl}</p>
-    //   `,
-    // };
-
-
-
-
-    // test mails
-
-     const testmailOptions = {
-      from: "nayandhongadi.kbk@gmail.com",
-      to: "varshithakbk319@gmail.com",
-      // cc: ["shivakrishna@equinoxitsol.com", "usitdallas@gmail.com"],
-      subject: `Test Dev New Inquiry Received by ${firstName} ${lastName} for SBA`,
+    const mailOptions = {
+      from: process.env.EMAIL_USER, // Sender address
+      to: "contact@sbataxconsultants.com",
+      cc: ["shivakrishna@equinoxitsol.com", "usitdallas@gmail.com"],
+      subject: `New Inquiry Received by ${firstName} ${lastName}`,
       html: `
-
-        <h3>Hello SBA Team </h3>
         <h3>New Inquiry Details:</h3>
         <p><strong>First Name:</strong> ${firstName}</p>
         <p><strong>Last Name:</strong> ${lastName}</p>
@@ -109,16 +81,12 @@ router.post('/submit-form', async (req, res) => {
     };
 
 
-    await transporter.sendMail(testmailOptions);
+    await transporter.sendMail(mailOptions);
     res.status(201).send({ message: 'Message saved successfully' });
   } catch (error) {
     res.status(500).send({ message: 'Error saving message', error });
   }
 });
-
-
-
-
 
 // API to get all data
 router.get('/get-all-data', async (req, res) => {
