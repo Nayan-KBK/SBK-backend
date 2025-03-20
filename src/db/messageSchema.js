@@ -30,11 +30,7 @@ const messageSchema = new mongoose.Schema({
   },
   pageUrl: {
     type: String,
-    required: true,  
-  },
-  page: {
-    type: String,
-    required: true, 
+    required: true, // To track the page (services, contact, home)
   },
   submittedAt: {
     type: Date,
