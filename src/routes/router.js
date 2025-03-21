@@ -71,7 +71,7 @@ router.post('/submit-form', async (req, res) => {
       from: process.env.EMAIL_USER,
       to: "contact@sbataxconsultants.com",
       cc: ["shivakrishna@equinoxitsol.com", "usitdallas@gmail.com"],
-      subject: `New Inquiry Received by ${firstName} ${lastName} for SBA`,
+      subject: `New Inquiry Received by ${firstName} ${lastName} for SBA from ${page}`,
       html: `
         <h3>New Inquiry Details:</h3>
         <p><strong>First Name:</strong> ${firstName}</p>
@@ -81,6 +81,7 @@ router.post('/submit-form', async (req, res) => {
         <p><strong>Subject:</strong> ${subject}</p>
         <p><strong>Message:</strong> ${message}</p>
         <p><strong>Page URL:</strong> ${pageUrl}</p>
+         <p><strong>Page :</strong> ${page}</p>
       `,
     };
 
