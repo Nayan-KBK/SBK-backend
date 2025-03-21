@@ -228,6 +228,11 @@ router.post("/login", async (req, res) => {
 });
 
 
+
+
+
+
+
 router.post('/export-excel', async (req, res) => {
   try {
     const { section, range } = req.body;
@@ -260,13 +265,32 @@ router.post('/export-excel', async (req, res) => {
 
     // Build the query based on the section and date range
     const query = {};
+    // if (section === 'all') {
+    // } else if (section === 'services') {
+    //   query.pageUrl = { $nin: ['home', 'contact-us'] }; 
+    // } else {
+    //   query.pageUrl = section; 
+    // }
+
+
     if (section === 'all') {
-      // If "all", fetch all data
-    } else if (section === 'services') {
-      query.pageUrl = { $nin: ['home', 'contact-us'] }; // Services pages
+      // Fetch all data
+    } else if (section === 'contact') {
+      query.page = 'contact-us';
+    } else if (section === 'home') {
+      query.page = 'home';
+    } else if (section === 'landing') {
+      query.page = 'landing-page';
+    } else if (section === 'service') {
+      query.page = 'service-page';
     } else {
-      query.pageUrl = section; // Specific section
+      return res.status(400).send({ message: 'Invalid section specified' });
     }
+
+
+ 
+
+
 
     if (startDate) {
       query.submittedAt = { $gte: startDate }; // Date filter
@@ -284,7 +308,8 @@ router.post('/export-excel', async (req, res) => {
       Subject: item.subject,
       Message: item.message,
       PageUrl: item.pageUrl,
-      SubmittedAt: item.submittedAt ? item.submittedAt.toISOString() : null,
+      Page:item.page,
+      SubmittedAt: item.submittedAt ? new Date(item.submittedAt).toLocaleString() : null,
     }));
 
     // Create the Excel workbook and worksheet in memory
@@ -312,6 +337,88 @@ router.post('/export-excel', async (req, res) => {
 
 
 
+// router.post('/export-excel', async (req, res) => {
+//   try {
+//     const { section, range } = req.body;
+
+//     // Calculate the start date based on the selected range
+//     const now = new Date();
+//     let startDate;
+//     switch (range) {
+//       case '7d':
+//         startDate = new Date(now - 7 * 24 * 60 * 60 * 1000);
+//         break;
+//       case '15d':
+//         startDate = new Date(now - 15 * 24 * 60 * 60 * 1000);
+//         break;
+//       case '1m':
+//         startDate = new Date(now.setMonth(now.getMonth() - 1));
+//         break;
+//       case '3m':
+//         startDate = new Date(now.setMonth(now.getMonth() - 3));
+//         break;
+//       case '6m':
+//         startDate = new Date(now.setMonth(now.getMonth() - 6));
+//         break;
+//       case '1y':
+//         startDate = new Date(now.setFullYear(now.getFullYear() - 1));
+//         break;
+//       default:
+//         startDate = null; // No date filter
+//     }
+
+//     // Build the query based on the section and date range
+//     const query = {};
+//     if (section === 'all') {
+//       // Fetch all data
+//     } else if (section === 'contact') {
+//       query.page = 'contact';
+//     } else if (section === 'home') {
+//       query.page = 'home';
+//     } else if (section === 'landing') {
+//       query.page = 'landing';
+//     } else if (section === 'service') {
+//       query.page = 'service';
+//     } else {
+//       return res.status(400).send({ message: 'Invalid section specified' });
+//     }
+
+//     if (startDate) {
+//       query.submittedAt = { $gte: startDate }; 
+//     }
+
+//     // Fetch the filtered data
+//     const data = await messageSchema.find(query).lean();
+
+//     // Format the data for Excel
+//     const formattedData = data.map(item => ({
+//       FirstName: item.firstName,
+//       LastName: item.lastName,
+//       Mobile: item.mobile,
+//       Email: item.email,
+//       Subject: item.subject,
+//       Message: item.message,
+//       Page: item.page,
+//       SubmittedAt: item.submittedAt ? item.submittedAt.toISOString() : null,
+//     }));
+
+//     // Create the Excel workbook and worksheet in memory
+//     const worksheet = XLSX.utils.json_to_sheet(formattedData);
+//     const workbook = XLSX.utils.book_new();
+//     XLSX.utils.book_append_sheet(workbook, worksheet, 'Messages');
+
+//     // Convert the workbook to a buffer
+//     const excelBuffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+//     // Send the buffer as a response
+//     res.setHeader('Content-Disposition', 'attachment; filename=messages.xlsx');
+//     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+//     res.send(excelBuffer);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send({ message: 'Error generating Excel file', error });
+//   }
+// });
 
 
 
